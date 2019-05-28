@@ -7,8 +7,18 @@ function genericOnClick(info, tab) {
   console.log("item " + info.menuItemId + " was clicked");
   console.log("info: " + JSON.stringify(info));
   console.log("tab: " + JSON.stringify(tab));
-}
+  alert("in works!!!!!");
 
+  let parent_s = chrome.contextMenus.create(
+    {"title": "Test parent_s item", "contexts" : ["selection"]});
+    let child1_s = chrome.contextMenus.create(
+    {"title": "Child 1 S", "parentId": parent_s, "onclick": genericOnClick ,
+     "contexts" : ["selection"]});
+     let child2_s = chrome.contextMenus.create(
+    {"title": "Child 2 S", "parentId": parent_s, "onclick": genericOnClick ,
+     "contexts" : ["selection"]});
+  console.log("parent:" + parent_s + " child1:" + child1_s + " child2:" + child2_s);
+}
 // //Create one test item for each context type.
 // var contexts = ["page","selection","link","editable","image","video",
 //                 "audio"];
@@ -28,15 +38,7 @@ function genericOnClick(info, tab) {
 //   {"title": "Child 2", "parentId": parent, "onclick": genericOnClick});
 // console.log("parent:" + parent + " child1:" + child1 + " child2:" + child2);
 
-// var parent_s = chrome.contextMenus.create(
-//   {"title": "Test parent_s item", "contexts" : ["selection"]});
-// var child1_s = chrome.contextMenus.create(
-//   {"title": "Child 1 S", "parentId": parent_s, "onclick": genericOnClick ,
-//    "contexts" : ["selection"]});
-// var child2_s = chrome.contextMenus.create(
-//   {"title": "Child 2 S", "parentId": parent_s, "onclick": genericOnClick ,
-//    "contexts" : ["selection"]});
-// console.log("parent:" + parent_s + " child1:" + child1_s + " child2:" + child2_s);
+
 
 
 //드래그 후 메뉴
