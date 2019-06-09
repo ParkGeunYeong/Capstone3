@@ -20,6 +20,18 @@ module.exports = function(app, HSL)
         })
     });
 
+    // GET HSLS BY URL_FROM
+    app.get('/api/url_from/:url_from(*)', function(req, res){
+        HSL.find({url_from : req.params.url_from}).sort({'published_date' : 1}).exec(
+            function(err, hsl){
+            if(err) return res.status(500).json({error: err});
+            if(!hsl) return res.status(404).json({error: 'hsl not found'});
+            res.json(hsl);
+        });
+    });
+
+
+
     // CREATE HSL
     app.post('/api/createHSL', function(req, res){
         var hsl = new HSL();
@@ -44,13 +56,20 @@ module.exports = function(app, HSL)
         });
     });
 
-    // UPDATE THE BOOK (ALTERNATIVE)
+    // UPDATE THE HSL
     app.put('/api/updateHSL/:hsl_id', function(req, res){
-        HSL.update({ _id: req.params.hsl_id }, { $set: req.body }, function(err, output){
-        if(err) res.status(500).json({ error: 'database failure' });
-        console.log(output);
-        if(!output.n) return res.status(404).json({ error: 'hsl not found' });
-        res.json( { message: 'hsl updated' } );
-    })
-});
+        HSL.findById(req.params.hsl_id, function(err, hsl){
+            if(err) return res.status(500).json({ error: 'database failure' });
+            if(!hsl) return res.status(404).json({ error: 'hsl not found' });
+    
+            if(req.body.url_to) hsl.url_to = req.body.url_to;
+    
+            hsl.save(function(err){
+                if(err) res.status(500).json({error: 'failed to update'});
+                res.json({message: 'hsl updated'});
+            });
+    
+        });
+    
+    });
 }

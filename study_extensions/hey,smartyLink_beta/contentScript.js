@@ -25,7 +25,7 @@ chrome.runtime.onMessage.addListener(
         console.log(Date.now());
 
         if(parentStrIndex != -1 && childStrIndex != -1){
-            let mid = `<a href="#" id="SmartLink" \
+            let mid = `<a href=${request.url_from} id="SmartLink" \
             style="border : 1px solid #999; color : red;">\
             ${request.text}</a>`
             let frontHTML = getElementByXPath.slice(0, parentStrIndex + childStrIndex);
@@ -36,11 +36,9 @@ chrome.runtime.onMessage.addListener(
             // console.log(modifiedHTML);
             document.evaluate(XPath,document, null, 
             XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.innerHTML = modifiedHTML;
-        
         }
 
         let hslBody = {
-            url_to : "yet",
             published_date : Date.now(),
             url_from : request.url_from,
             XPath : XPath,
@@ -56,12 +54,7 @@ chrome.runtime.onMessage.addListener(
         }
         
 
-    } else if(request.toDo === "url_from_trigger"){
-
-        console.log(request.data);
-
-    //준비된 데이터 불러와서 페이지 수정하기
-    } else if(request.toDo === "url_from_ready"){
+    } else if(request.toDo === "url_from"){
         for(let k in request.data){
             console.log(k, request.data[k]);
 
@@ -72,8 +65,10 @@ chrome.runtime.onMessage.addListener(
                 .replace(/&nbsp;/g," ").replace(/&lt;/g,"<").replace(/&gt;/g,">")
                 .replace(/&amp;/g,"&").replace(/&quot;/g,'"');
 
-            let mid = `<a href=${request.data[k].url_to} id="SmartLink" \
-            style="border : 1px solid #999; color : green;">\
+            let mid = `<a href=\
+            ${request.data[k].url_to === "yet" ? request.data[k].url_from : request.data[k].url_to} \
+            id="SmartLink" style="border : 1px solid #999; color : \
+            ${request.data[k].url_to === "yet" ? "red" : "green"};">\
             ${request.data[k].text}</a>`
             let frontHTML = getElementByXPath.slice(0, request.data[k].parentStrIndex 
                 + request.data[k].childStrIndex);
@@ -88,6 +83,7 @@ chrome.runtime.onMessage.addListener(
         }
     }
 });
+    
 
 
 function getPathTo(element) {

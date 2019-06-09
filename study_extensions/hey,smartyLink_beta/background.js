@@ -3,12 +3,6 @@ xmlhttp_trigger.onreadystatechange = function() {
   if (this.readyState == 4 && this.status == 200) {
 
     var url_from_trigger_data = JSON.parse(this.responseText);
-    console.log(url_from_trigger_data);
-
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {data: url_from_trigger_data,
-        toDo : "url_from_trigger"});
-    });
 
     let triggers = {};
     for(let k in url_from_trigger_data){
@@ -16,6 +10,7 @@ xmlhttp_trigger.onreadystatechange = function() {
       triggers[k] = chrome.contextMenus.create({
         "title": k + "번 " + url_from_trigger_data[k].text,
         "contexts":["page"],
+        "id" : url_from_trigger_data[k]._id,
         "onclick" : pullTheTrigger
       });
     }
@@ -23,20 +18,29 @@ xmlhttp_trigger.onreadystatechange = function() {
   }
 };
 
-var xmlhttp_ready = new XMLHttpRequest();
-xmlhttp_ready.onreadystatechange = function() {
+var xmlhttp= new XMLHttpRequest();
+xmlhttp.onreadystatechange = function() {
   if (this.readyState == 4 && this.status == 200) {
 
-    var url_from_ready_data = JSON.parse(this.responseText);
-    console.log(url_from_ready_data);
+    var url_from_data = JSON.parse(this.responseText);
+    console.log(url_from_data);
 
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {data: url_from_ready_data,
-        toDo : "url_from_ready"});
+      chrome.tabs.sendMessage(tabs[0].id, {data: url_from_data,
+        toDo : "url_from"});
     });
 
   }
 };
+
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() { // Call a function when the state changes.
+    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+      let result = JSON.parse(this.responseText);
+      console.log(result);
+    }
+}
+
 
 //현재 페이지의 북마크 생성
 //현재 페이지에서 선택한 부분의 위치를 기억 후 트리거 생성
@@ -52,6 +56,10 @@ function SmartLinkTriggerOnClick(info, tab){
             console.log(response.error);
           } else{
             console.log(response.hslBody);
+            xhr.open("POST", 'http://121.140.222.97:41335/api/createHSL', true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.send(JSON.stringify(response.hslBody));
+
           }
         });
       });
@@ -59,6 +67,11 @@ function SmartLinkTriggerOnClick(info, tab){
 
 function pullTheTrigger(info,tab){
   console.log(info, tab)
+  let url_PUT = 'http://121.140.222.97:41335/api/updateHSL/' + info.menuItemId;
+  xhr.open("PUT", url_PUT, true);
+  xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  xhr.send(JSON.stringify({url_to : info.pageUrl}));
+  chrome.contextMenus.remove(info.menuItemId);
 }
 
 chrome.tabs.onUpdated.addListener(function(tabId,changeInfo,tab){
@@ -76,9 +89,9 @@ chrome.tabs.onUpdated.addListener(function(tabId,changeInfo,tab){
     xmlhttp_trigger.open("GET", url_from_trigger,true);
     xmlhttp_trigger.send();
 
-    let url_from_ready = `http://121.140.222.97:41335/api/url_from_ready/` + tab.url;
-    xmlhttp_ready.open("GET", url_from_ready,true);
-    xmlhttp_ready.send();
+    let url_from = `http://121.140.222.97:41335/api/url_from/` + tab.url;
+    xmlhttp.open("GET", url_from,true);
+    xmlhttp.send();
 
   }
 })
