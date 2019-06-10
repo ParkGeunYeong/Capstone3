@@ -30,6 +30,16 @@ module.exports = function(app, HSL)
         });
     });
 
+    app.get('/api/url_from_XPath/:XPath:url_from(*)', function(req, res){
+        HSL.find({XPath : req.params.XPath, url_from : req.params.url_from}).sort({'published_date' : 1}).exec(
+            function(err, hsl){
+            if(err) return res.status(500).json({error: err});
+            if(!hsl) return res.status(404).json({error: 'hsl not found'});
+            res.json(hsl);
+        });
+    });
+
+
 
 
     // CREATE HSL
@@ -62,7 +72,26 @@ module.exports = function(app, HSL)
             if(err) return res.status(500).json({ error: 'database failure' });
             if(!hsl) return res.status(404).json({ error: 'hsl not found' });
     
-            if(req.body.url_to) hsl.url_to = req.body.url_to;
+            if(req.body.url_to){
+                hsl.url_to = req.body.url_to;
+                let url_gap_length = hsl.url_to.length - hsl.url_from.length + 2;
+                HSL.find({XPath : hsl.XPath, url_from : hsl.url_from,
+                    published_date :{$gt : hsl.published_date},
+                    parentStrIndex : {$gt : hsl.parentStrIndex}})
+                .sort({'published_date' : 1}).exec(function(err, hsls){
+                    for(let h in hsls){
+                        hsls[h].parentStrIndex += url_gap_length;
+                        hsls[h].save(function(err){
+                            if(err) console.log(err);
+                            else console.log("modify complete");
+                        });
+                    }
+                    // hsls.save(function(err){
+                    //     if(err) console.log(err);
+                    //     else console.log("modify complete")
+                    // });
+                });
+            } 
     
             hsl.save(function(err){
                 if(err) res.status(500).json({error: 'failed to update'});

@@ -1,6 +1,6 @@
 {
     "name": "Hey, Smarty Link!",
-    "version": "0.1",
+    "version": "0.2",
     "description": "Smart way of studying something with web surfing.",
     "permissions": [
       "bookmarks",

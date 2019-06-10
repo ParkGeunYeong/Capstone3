@@ -6,7 +6,7 @@ xmlhttp_trigger.onreadystatechange = function() {
 
     let triggers = {};
     for(let k in url_from_trigger_data){
-      console.log(k, url_from_trigger_data[k]);
+      // console.log(k, url_from_trigger_data[k]);
       triggers[k] = chrome.contextMenus.create({
         "title": k + "번 " + url_from_trigger_data[k].text,
         "contexts":["page"],
@@ -23,7 +23,7 @@ xmlhttp.onreadystatechange = function() {
   if (this.readyState == 4 && this.status == 200) {
 
     var url_from_data = JSON.parse(this.responseText);
-    console.log(url_from_data);
+    // console.log(url_from_data);
 
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       chrome.tabs.sendMessage(tabs[0].id, {data: url_from_data,
@@ -37,7 +37,7 @@ var xhr = new XMLHttpRequest();
 xhr.onreadystatechange = function() { // Call a function when the state changes.
     if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
       let result = JSON.parse(this.responseText);
-      console.log(result);
+      // console.log(result);
     }
 }
 
@@ -48,14 +48,14 @@ function SmartLinkTriggerOnClick(info, tab){
     //console.log(info);
     //console.log(tab);
     let selectedText = info.selectionText;
-    console.log(selectedText);
+    //console.log(selectedText);
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {text: selectedText,
           url_from : tab.url, toDo : "makeTrigger"}, function(response) {
           if(response.error){
-            console.log(response.error);
+            //console.log(response.error);
           } else{
-            console.log(response.hslBody);
+            //console.log(response.hslBody);
             xhr.open("POST", 'http://121.140.222.97:41335/api/createHSL', true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.send(JSON.stringify(response.hslBody));
@@ -66,7 +66,8 @@ function SmartLinkTriggerOnClick(info, tab){
 }
 
 function pullTheTrigger(info,tab){
-  console.log(info, tab)
+  //console.log(info, tab)
+  //console.log(info.pageUrl, info.pageUrl.length);
   let url_PUT = 'http://121.140.222.97:41335/api/updateHSL/' + info.menuItemId;
   xhr.open("PUT", url_PUT, true);
   xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -84,7 +85,7 @@ chrome.tabs.onUpdated.addListener(function(tabId,changeInfo,tab){
     "onclick": SmartLinkTriggerOnClick
     });
 
-    console.log(tab.url);
+    // console.log(tab.url);
     let url_from_trigger = `http://121.140.222.97:41335/api/url_from_trigger`;
     xmlhttp_trigger.open("GET", url_from_trigger,true);
     xmlhttp_trigger.send();

@@ -19,15 +19,13 @@ chrome.runtime.onMessage.addListener(
         let parentStrIndex = getElementByXPath.indexOf(anchorNodeText);
         let childStrIndex = anchorNodeText.indexOf(request.text);
 
-        console.log(parentStrIndex);
-        console.log(childStrIndex);
-        console.log(request.text.length);
-        console.log(Date.now());
+        // console.log(parentStrIndex);
+        // console.log(childStrIndex);
+        // console.log(request.text.length);
+        // console.log(Date.now());
 
         if(parentStrIndex != -1 && childStrIndex != -1){
-            let mid = `<a href=${request.url_from} id="SmartLink" \
-            style="border : 1px solid #999; color : red;">\
-            ${request.text}</a>`
+            let mid = `<a href = ${request.url_from} id = "SmartLink" style = "border : 1px solid #999; color : red;">${request.text}</a>`;
             let frontHTML = getElementByXPath.slice(0, parentStrIndex + childStrIndex);
             let backHTML = getElementByXPath.slice(
             parentStrIndex + childStrIndex + request.text.length, getElementByXPath.length)
@@ -52,11 +50,11 @@ chrome.runtime.onMessage.addListener(
         } else{
             sendResponse({error : "error"});
         }
-        
+        //location.reload();
 
     } else if(request.toDo === "url_from"){
         for(let k in request.data){
-            console.log(k, request.data[k]);
+            // console.log(k, request.data[k]);
 
             let getElementByXPath = document.evaluate(request.data[k].XPath,document,
                 null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.innerHTML
@@ -65,11 +63,7 @@ chrome.runtime.onMessage.addListener(
                 .replace(/&nbsp;/g," ").replace(/&lt;/g,"<").replace(/&gt;/g,">")
                 .replace(/&amp;/g,"&").replace(/&quot;/g,'"');
 
-            let mid = `<a href=\
-            ${request.data[k].url_to === "yet" ? request.data[k].url_from : request.data[k].url_to} \
-            id="SmartLink" style="border : 1px solid #999; color : \
-            ${request.data[k].url_to === "yet" ? "red" : "green"};">\
-            ${request.data[k].text}</a>`
+            let mid = `<a href = ${request.data[k].url_to === "yet" ? request.data[k].url_from : request.data[k].url_to} id ="SmartLink" style =  "border : 1px solid #999; color : ${request.data[k].url_to === "yet" ? "red" : "green"};">${request.data[k].text}</a>`;
             let frontHTML = getElementByXPath.slice(0, request.data[k].parentStrIndex 
                 + request.data[k].childStrIndex);
             let backHTML = getElementByXPath.slice(
@@ -78,8 +72,6 @@ chrome.runtime.onMessage.addListener(
             let modifiedHTML = frontHTML + mid + backHTML;
             document.evaluate(request.data[k].XPath,document, null, 
                 XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.innerHTML = modifiedHTML;
-            
-
         }
     }
 });
