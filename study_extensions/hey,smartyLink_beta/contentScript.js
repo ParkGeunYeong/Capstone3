@@ -54,7 +54,7 @@ chrome.runtime.onMessage.addListener(
 
     } else if(request.toDo === "url_from"){
         for(let k in request.data){
-            // console.log(k, request.data[k]);
+            console.log(k, request.data[k]);
 
             let getElementByXPath = document.evaluate(request.data[k].XPath,document,
                 null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.innerHTML
@@ -63,7 +63,7 @@ chrome.runtime.onMessage.addListener(
                 .replace(/&nbsp;/g," ").replace(/&lt;/g,"<").replace(/&gt;/g,">")
                 .replace(/&amp;/g,"&").replace(/&quot;/g,'"');
 
-            let mid = `<a href = ${request.data[k].url_to === "yet" ? request.data[k].url_from : request.data[k].url_to} id ="SmartLink" style =  "border : 1px solid #999; color : ${request.data[k].url_to === "yet" ? "red" : "green"};">${request.data[k].text}</a>`;
+            let mid = `<a href = ${request.data[k].url_to === "yet" ? decodeURIComponent(request.data[k].url_from) : decodeURIComponent(request.data[k].url_to)} id ="SmartLink" style =  "border : 1px solid #999; color : ${request.data[k].url_to === "yet" ? "red" : "green"};">${request.data[k].text}</a>`;
             let frontHTML = getElementByXPath.slice(0, request.data[k].parentStrIndex 
                 + request.data[k].childStrIndex);
             let backHTML = getElementByXPath.slice(

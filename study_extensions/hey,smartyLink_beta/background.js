@@ -6,7 +6,7 @@ xmlhttp_trigger.onreadystatechange = function() {
 
     let triggers = {};
     for(let k in url_from_trigger_data){
-      // console.log(k, url_from_trigger_data[k]);
+      //console.log(k, url_from_trigger_data[k]);
       triggers[k] = chrome.contextMenus.create({
         "title": k + "번 " + url_from_trigger_data[k].text,
         "contexts":["page"],
@@ -23,7 +23,7 @@ xmlhttp.onreadystatechange = function() {
   if (this.readyState == 4 && this.status == 200) {
 
     var url_from_data = JSON.parse(this.responseText);
-    // console.log(url_from_data);
+     console.log(url_from_data);
 
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       chrome.tabs.sendMessage(tabs[0].id, {data: url_from_data,
@@ -85,12 +85,12 @@ chrome.tabs.onUpdated.addListener(function(tabId,changeInfo,tab){
     "onclick": SmartLinkTriggerOnClick
     });
 
-    // console.log(tab.url);
+    console.log(tab.url);
     let url_from_trigger = `http://121.140.222.97:41335/api/url_from_trigger`;
     xmlhttp_trigger.open("GET", url_from_trigger,true);
     xmlhttp_trigger.send();
 
-    let url_from = `http://121.140.222.97:41335/api/url_from/` + tab.url;
+    let url_from = `http://121.140.222.97:41335/api/url_from/` + encodeURIComponent(tab.url);
     xmlhttp.open("GET", url_from,true);
     xmlhttp.send();
 
