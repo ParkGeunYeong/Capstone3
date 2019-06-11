@@ -86,8 +86,8 @@ chrome.tabs.onUpdated.addListener(function(tabId,changeInfo,tab){
     });
 
     console.log(tab.url);
-    let url_from_trigger = `http://121.140.222.97:41335/api/url_from_trigger`;
-    xmlhttp_trigger.open("GET", url_from_trigger,true);
+    let trigger = `http://121.140.222.97:41335/api/trigger`;
+    xmlhttp_trigger.open("GET", trigger,true);
     xmlhttp_trigger.send();
 
     let url_from = `http://121.140.222.97:41335/api/url_from/` + encodeURIComponent(tab.url);

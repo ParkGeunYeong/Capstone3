@@ -3,17 +3,8 @@ module.exports = function(app, HSL)
 {
 
     // GET HSLS BY URL_FROM
-    app.get('/api/url_from_trigger', function(req, res){
+    app.get('/api/trigger', function(req, res){
         HSL.find({url_to : "yet"}, function(err, hsl){
-            if(err) return res.status(500).json({error: err});
-            if(!hsl) return res.status(404).json({error: 'hsl not found'});
-            res.json(hsl);
-        })
-    });
-
-    // GET HSLS BY URL_FROM
-    app.get('/api/url_from_ready/:url_from(*)', function(req, res){
-        HSL.find({$and:[{url_from : req.params.url_from},{url_to : {$ne : "yet"}} ]}, function(err, hsl){
             if(err) return res.status(500).json({error: err});
             if(!hsl) return res.status(404).json({error: 'hsl not found'});
             res.json(hsl);
@@ -29,18 +20,6 @@ module.exports = function(app, HSL)
             res.json(hsl);
         });
     });
-
-    app.get('/api/url_from_XPath/:XPath:url_from(*)', function(req, res){
-        HSL.find({XPath : req.params.XPath, url_from : req.params.url_from}).sort({'published_date' : 1}).exec(
-            function(err, hsl){
-            if(err) return res.status(500).json({error: err});
-            if(!hsl) return res.status(404).json({error: 'hsl not found'});
-            res.json(hsl);
-        });
-    });
-
-
-
 
     // CREATE HSL
     app.post('/api/createHSL', function(req, res){
@@ -86,10 +65,6 @@ module.exports = function(app, HSL)
                             else console.log("modify complete");
                         });
                     }
-                    // hsls.save(function(err){
-                    //     if(err) console.log(err);
-                    //     else console.log("modify complete")
-                    // });
                 });
             } 
     
